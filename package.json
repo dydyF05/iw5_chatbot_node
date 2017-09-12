@@ -1,0 +1,23 @@
+{
+  "name": "chatbot",
+  "version": "1.0.0",
+  "description": "chatbot made in esgi",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dydyFos/iw5_chatbot_node.git"
+  },
+  "keywords": [
+    "chatbot",
+    "node"
+  ],
+  "author": "dydyFos",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dydyFos/iw5_chatbot_node/issues"
+  },
+  "homepage": "https://github.com/dydyFos/iw5_chatbot_node#readme"
+}
