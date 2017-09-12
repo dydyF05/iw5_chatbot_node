@@ -19,5 +19,12 @@
   "bugs": {
     "url": "https://github.com/dydyFos/iw5_chatbot_node/issues"
   },
-  "homepage": "https://github.com/dydyFos/iw5_chatbot_node#readme"
+  "homepage": "https://github.com/dydyFos/iw5_chatbot_node#readme",
+  "devDependencies": {
+    "nodemon": "^1.12.0"
+  },
+  "dependencies": {
+    "botbuilder": "^3.9.1",
+    "restify": "^5.2.0"
+  }
 }
