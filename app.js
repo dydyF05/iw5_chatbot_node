@@ -1,5 +1,6 @@
 const builder = require('botbuilder')
 const restify = require('restify')
+const HEAVY_WORK_TIMELAPSE = "10000";
 
 const server = restify.createServer()
 server.listen(process.env.port || 3978, () => {
@@ -14,13 +15,24 @@ const connector = new builder.ChatConnector({
 
 server.post('api/messages', connector.listen())
 
-
+const generateTypingNotice = (session) => {
+    const typingNotice = setInterval(() => {
+        session.sendTyping();
+    }, Math.floor(HEAVY_WORK_TIMELAPSE/4));
+    setTimeout(() => {
+        session.send(`Man that was heavy`);
+        clearInterval(typingNotice);
+    }, HEAVY_WORK_TIMELAPSE);
+};
 
 const bot = new builder.UniversalBot(connector, (session) => {
+    const {text} = session.message;
+    if ( text === 'doheavywork' )
+        return generateTypingNotice(session);
     session.send(`session.message.type ${session.message.type}`) 
     session.send(`it's working !`)
-    session.send(`msg: ${session.message.text}`)
-    session.send(`msg length: ${session.message.text.length}`)
+    session.send(`msg: ${text}`)
+    session.send(`msg length: ${text.length}`)
     session.send(`DialogData: ${JSON.stringify(session.dialogData)}`)
 })
 
