@@ -46,26 +46,19 @@ bot.dialog('firstRun', (session) => {
 });
 
 bot.on('conversationUpdate', (message) => {
-    if (message.membersAdded && message.membersAdded.length > 0) {
-        // Say hello
+    if (message.membersAdded && message.membersAdded.length && message.membersAdded.find(m => m.id !== message.address.bot.id) ) {
         const isGroup = message.address.conversation.isGroup;
-        const txt = isGroup ? "Hello new comers!" : "Yo dude";
+        const txt = isGroup ? "Hello new comers!" : `Welcome ${message.membersAdded.map(curUser => curUser.name).toString()}`;
         const reply = new builder.Message()
             .address(message.address)
             .text(txt);
         bot.send(reply);
     } else if (message.membersRemoved) {
-        // See if bot was removed
-        var botId = message.address.bot.id;
-        for (var i = 0; i < message.membersRemoved.length; i++) {
-            if (message.membersRemoved[i].id === botId) {
-                // Say goodbye
-                var reply = new builder.Message()
-                    .address(message.address)
-                    .text("Bb babe");
-                bot.send(reply);
-                break;
-            }
+        const botId = message.address.bot.id;
+        if (message.membersRemoved.find(leavingMember => leavingMember.id === botId ) ) {
+            bot.send(new builder.Message()
+                .address(message.address)
+                .text("Bb bottee"));
         }
     }
 });
