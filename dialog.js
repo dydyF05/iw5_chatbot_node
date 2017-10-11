@@ -10,10 +10,6 @@ function savePrivateDialogData(session, data) {
     )
     console.log("private dialog data: ", session.privateConversationData)
 }
-function recapReservation(session) {
-    session.endDialog(`Reservation for ${session.privateConversationData.peopleCount} on the ${moment(session.privateConversationData.time).format("YYYY-MM-DD hh:mm")} at the name ${session.privateConversationData.name}`)
-    console.log(session.privateConversationData)
-}
 
 const server = restify.createServer()
 server.listen(process.env.port || 3978, () => {
@@ -25,7 +21,6 @@ const connector = new builder.ChatConnector({
     appId: process.env.APP_ID,
     appPassword: process.env.APP_PASSWORD
 })
-
 
 server.post('api/messages', connector.listen())
 
@@ -49,7 +44,7 @@ bot.dialog('reservation', [
     (session) => session.beginDialog('askDate'),
     (session) => session.beginDialog('askPeopleCount'),
     (session) => session.beginDialog('askResName'),
-    recapReservation
+    (session) => session.beginDialog('recapRes')
 ])
 
 bot.dialog('askDate', [
@@ -73,4 +68,7 @@ bot.dialog('askResName', [
         savePrivateDialogData(session, { name: results.response })
         session.endDialog()
     }
+])
+bot.dialog('recapRes', [
+    (session) => session.endDialog(`Reservation for ${session.privateConversationData.peopleCount} on the ${moment(session.privateConversationData.time).format('lll')} at the name "${session.privateConversationData.name}"`)
 ])
