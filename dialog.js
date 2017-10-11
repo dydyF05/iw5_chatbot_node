@@ -4,6 +4,7 @@ const moment = require('moment')
 moment.locale('en')
 
 function savePrivateDialogData(session, data) {
+    if(!session | !data) throw Error("Missing saving argument")
     session.privateConversationData = Object.assign(
         session.privateConversationData,
         data
@@ -29,12 +30,7 @@ const bot = new builder.UniversalBot(connector, [
 ])
 
 bot.dialog('greetings', [
-    (session) => session.beginDialog('askName'),
-    (session, results) => {
-        savePrivateDialogData(session, {userName: results.response})
-        session.endDialog(`Welcome ${results.response} !`)
-        session.beginDialog('reservation')
-    }
+    (session) => session.beginDialog('testChoices')
 ])
 bot.dialog('askName', [
     (session) => builder.Prompts.text(session, 'Hey, what can I call you ?'),
@@ -71,4 +67,13 @@ bot.dialog('askResName', [
 ])
 bot.dialog('recapRes', [
     (session) => session.endDialog(`Reservation for ${session.privateConversationData.peopleCount} on the ${moment(session.privateConversationData.time).format('lll')} at the name "${session.privateConversationData.name}"`)
+])
+bot.dialog('testChoices', [
+    (session) => builder.Prompts.choice(session, "Which Town", ["Dean", "Pine", "Quoke"]),
+    (session, results) => {
+        console.log(results.response)
+        savePrivateDialogData(session, { testChoice: results.response.entity })
+        session.send(`${results.response.entity}, you got it !`)
+        session.endDialog()
+    }
 ])
