@@ -91,8 +91,28 @@ bot.dialog('chooseMenu', [
         savePrivateDialogData(session, { testChoice: menu[results.response.entity] })
         session.send(`${results.response.entity}, you got it !`)
         session.endDialog()
-    }
+    },
+    (session) => session.beginDialog('askPhoneNumber')
 ]).triggerAction({
     matches: /^choose menu$/i,
     confirmPrompt: "This will cancel your order. Are you sure?"
 });
+bot.dialog('askPhoneNumber', [
+    (session, args) => {
+        if (args && args.reprompt) {
+            builder.Prompts.text(session, "What's your phone number ? (10 digits starting 01, 06 or 07)")
+        } else {
+            builder.Prompts.text(session, "What's your phone number?");
+        }
+    },
+    (session, results) => {
+        const matched = results.response.match(/\d+/g)
+        const phoneNumber = matched ? matched.join('') : ''
+        if (phoneNumber.length == 10 && phoneNumber.indexOf('01') === 0 || phoneNumber.indexOf('06') === 0 || phoneNumber.indexOf('07') === 0) {
+            savePrivateDialogData({phoneNumber})
+            session.endDialogWithResult({ response: number })
+        } else {
+            session.replaceDialog('askPhoneNumber', { reprompt: true });
+        }
+    }
+]);
