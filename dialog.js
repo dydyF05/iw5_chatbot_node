@@ -1,7 +1,22 @@
 const builder = require('botbuilder')
 const restify = require('restify')
 const moment = require('moment')
+const readJson = require('read-json')
 moment.locale('en')
+const menu = {
+    "Dish 1": {
+        Description: "First dish's description",
+        Price: "10"
+    },
+    "Dish 2": {
+        Description: "Second dish's description",
+        Price: "12"
+    },
+    "Dish 3": {
+        Description: "Third dish's description",
+        Price: "11.50"
+    }
+}
 
 function savePrivateDialogData(session, data) {
     if(!session | !data) throw Error("Missing saving argument")
@@ -30,7 +45,9 @@ const bot = new builder.UniversalBot(connector, [
 ])
 
 bot.dialog('greetings', [
-    (session) => session.beginDialog('testChoices')
+    (session) => session.beginDialog('askName'),
+    (session) => session.beginDialog('reservation'),
+    (session) => session.beginDialog('chooseMenu'),
 ])
 bot.dialog('askName', [
     (session) => builder.Prompts.text(session, 'Hey, what can I call you ?'),
@@ -68,12 +85,14 @@ bot.dialog('askResName', [
 bot.dialog('recapRes', [
     (session) => session.endDialog(`Reservation for ${session.privateConversationData.peopleCount} on the ${moment(session.privateConversationData.time).format('lll')} at the name "${session.privateConversationData.name}"`)
 ])
-bot.dialog('testChoices', [
-    (session) => builder.Prompts.choice(session, "Which Town", ["Dean", "Pine", "Quoke"]),
+bot.dialog('chooseMenu', [
+    (session) => builder.Prompts.choice(session, "Choose a menu", menu),
     (session, results) => {
-        console.log(results.response)
-        savePrivateDialogData(session, { testChoice: results.response.entity })
+        savePrivateDialogData(session, { testChoice: menu[results.response.entity] })
         session.send(`${results.response.entity}, you got it !`)
         session.endDialog()
     }
-])
+]).triggerAction({
+    matches: /^choose menu$/i,
+    confirmPrompt: "This will cancel your order. Are you sure?"
+});
